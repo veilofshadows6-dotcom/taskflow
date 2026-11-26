@@ -5,6 +5,14 @@ import Auth from "./Auth";
 import { supabase } from "./supabaseClient";
 
 function App() {
+  const currentHour = new Date().getHours();
+
+const greeting =
+  currentHour < 12
+    ? "Good morning"
+    : currentHour < 17
+    ? "Good afternoon"
+    : "Good evening";
   const [session, setSession] = useState(null);
 const [authLoading, setAuthLoading] = useState(true);
 
@@ -341,7 +349,7 @@ return (
     <section className="welcome">
       <div>
         <p className="welcome-label">YOUR WORKSPACE</p>
-        <h1>Good morning, {userName || "User"}! 👋</h1>
+        <h1>{greeting}, {userName || "User"}! 👋</h1>
             <p>Here's what's happening with your tasks today.</p>
           </div>
 

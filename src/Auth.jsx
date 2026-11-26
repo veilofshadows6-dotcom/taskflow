@@ -89,19 +89,24 @@ export default function Auth({ onAuthSuccess }) {
 
         if (error) throw error;
 
-        if (data.session) {
-          if (avatarFile) {
-            await uploadAvatar(data.user);
-          }
-
-          onAuthSuccess(data.session);
-        } else {
-          setMessage(
-            avatarFile
-              ? "Account created! Confirm your email first. You can upload your profile picture after logging in."
-              : "Account created! Please check your email to confirm your account."
-          );
+        if (data.session && avatarFile) {
+          await uploadAvatar(data.user);
         }
+
+        if (data.session) {
+          const { error: signOutError } = await supabase.auth.signOut();
+
+          if (signOutError) throw signOutError;
+        }
+
+        setIsLogin(true);
+        setPassword("");
+
+        setMessage(
+          data.session
+            ? "Registration successful! Please log in with your email and password."
+            : "Account created! Please confirm your email, then log in."
+        );
       }
     } catch (error) {
       setMessage(error.message);
@@ -147,10 +152,7 @@ export default function Auth({ onAuthSuccess }) {
 
                 {avatarPreview && (
                   <div className="avatar-preview">
-                    <img
-                      src={avatarPreview}
-                      alt="Profile preview"
-                    />
+                    <img src={avatarPreview} alt="Profile preview" />
                     <span>Picture selected</span>
                   </div>
                 )}
