@@ -2106,3 +2106,48 @@ footer {
   color: #c13e4d;
   border-color: #f5d0d4;
 }
+/* LOGOUT BUTTON */
+
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 16px;
+  margin-top: 18px;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background: transparent;
+  color: #e05252;
+
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+
+  transition: all 0.25s ease;
+}
+
+.logout-button:hover {
+  background: rgba(220, 70, 70, 0.10);
+  border-color: rgba(220, 70, 70, 0.18);
+  transform: translateY(-1px);
+}
+
+.logout-button:active {
+  transform: scale(0.98);
+}
+
+.logout-button:focus-visible {
+  outline: 2px solid #e05252;
+  outline-offset: 3px;
+}
+
+
+.logout-button:hover {
+  background: rgba(220, 70, 70, 0.16);
+}

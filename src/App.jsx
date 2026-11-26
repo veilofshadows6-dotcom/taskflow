@@ -14,6 +14,13 @@ const greeting =
     ? "Good afternoon"
     : "Good evening";
   const [session, setSession] = useState(null);
+  const [tasks, setTasks] = useState(() => {
+  try {
+    return JSON.parse(localStorage.getItem("taskflow-tasks")) || [];
+  } catch {
+    return [];
+  }
+});
 const [authLoading, setAuthLoading] = useState(true);
 const [authMode, setAuthMode] = useState("register");
 
@@ -29,72 +36,82 @@ const handleLogout = async () => {
   setSession(null);
 };
 
+
+
 useEffect(() => {
-  supabase.auth.getSession().then(({ data, error }) => {
-    if (error) {
-      console.error("Session error:", error.message);
+  let isMounted = true;
+
+  // Check for an existing session only when the app first loads
+  const checkInitialSession = async () => {
+    try {
+      const {
+        data: { session: currentSession },
+        error: sessionError
+      } = await supabase.auth.getSession();
+
+      if (sessionError) throw sessionError;
+
+      if (!currentSession) {
+        if (isMounted) setSession(null);
+        return;
+      }
+
+      // Verify that the account still exists in Supabase
+      const {
+        data: { user },
+        error: userError
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        await supabase.auth.signOut({ scope: "local" });
+
+        if (isMounted) {
+          setSession(null);
+          setAuthMode("login");
+        }
+
+        return;
+      }
+
+      if (isMounted) {
+        setSession(currentSession);
+      }
+    } catch (error) {
+      console.error("Session verification error:", error);
+
+      if (isMounted) {
+        setSession(null);
+      }
+    } finally {
+      if (isMounted) {
+        setAuthLoading(false);
+      }
+    }
+  };
+
+  checkInitialSession();
+
+  // Listen for logout and token refresh events
+  const {
+    data: { subscription }
+  } = supabase.auth.onAuthStateChange((event, newSession) => {
+    if (event === "SIGNED_OUT") {
+      setSession(null);
+      setAuthMode("login");
     }
 
-    setSession(data?.session ?? null);
-    setAuthLoading(false);
+    if (event === "TOKEN_REFRESHED") {
+      setSession(newSession);
+    }
   });
 
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
-    setSession(session);
-    setAuthLoading(false);
-  });
-
-  return () => subscription.unsubscribe();
+  return () => {
+    isMounted = false;
+    subscription.unsubscribe();
+  };
 }, []);
 
-const [tasks, setTasks] = useState(() => {
-  const savedTasks = localStorage.getItem("taskflow-tasks");
 
-  if (savedTasks) {
-    const existingTasks = JSON.parse(savedTasks);
-
-    return existingTasks.map(task => ({
-      ...task,
-      deadline: task.deadline || "2026-11-30"
-    }));
-  }
-  return [
-    {
-      id: 1,
-      title: "Complete website design",
-      category: "Design",
-      priority: "High",
-      done: false,
-      deadline: "2026-11-27"
-    },
-    {
-      id: 2,
-      title: "Review project proposal",
-      category: "Work",
-      priority: "Medium",
-      done: true,
-      deadline: "2026-11-28"
-    },
-    {
-      id: 3,
-      title: "Prepare client presentation",
-      category: "Meeting",
-      priority: "High",
-      done: false,
-      deadline: "2026-11-29"
-    },
-    {
-      id: 4,
-      title: "Update project documentation",
-      category: "Work",
-      priority: "Low",
-      done: false,
-      deadline: "2026-12-01"
-    }
-  ];
-});
 const [isDarkMode, setIsDarkMode] = useState(() => {
   return localStorage.getItem("taskflow-theme") !== "light";
 });
@@ -316,14 +333,24 @@ return (
   </div>
 
   <div
-    className={`nav-item ${activePage === "Settings" ? "active" : ""}`}
-    onClick={() => {
-      setActivePage("Settings");
-      setMobileMenuOpen(false);
-    }}
-  >
-    ⚙ &nbsp; Settings
-  </div>
+  className={`nav-item ${activePage === "Settings" ? "active" : ""}`}
+  onClick={() => {
+    setActivePage("Settings");
+    setMobileMenuOpen(false);
+  }}
+>
+  ⚙ &nbsp; Settings
+</div>
+
+<div
+  className="nav-item"
+  onClick={() => {
+    setMobileMenuOpen(false);
+    handleLogout();
+  }}
+>
+  ↪ &nbsp; Logout
+</div>
 
 </div>
 
@@ -356,6 +383,11 @@ return (
     <small>{userEmail || "Personal Account"}</small>
   </div>
 </div>
+<button
+  className="logout-button"
+  onClick={handleLogout}
+>
+</button>
 </aside>
 
       <main className="main-content">

@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
 
-export default function Auth({ onAuthSuccess }) {
-  const [isLogin, setIsLogin] = useState(false);
+export default function Auth({ onAuthSuccess, initialMode = "register" }) {
+  const [isLogin, setIsLogin] = useState(initialMode === "login");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -92,14 +92,18 @@ export default function Auth({ onAuthSuccess }) {
         if (data.session && avatarFile) {
           await uploadAvatar(data.user);
         }
+// Always end the registration session
+await supabase.auth.signOut({ scope: "local" });
 
-        if (data.session) {
-          const { error: signOutError } = await supabase.auth.signOut();
+// Clear the password and switch to login
+setPassword("");
+setAvatarFile(null);
+setAvatarPreview("");
+setIsLogin(true);
 
-          if (signOutError) throw signOutError;
-        }
-
-        setIsLogin(true);
+setMessage(
+  "Registration successful! Please log in with your email and password."
+);
         setPassword("");
 
         setMessage(
