@@ -309,14 +309,36 @@ return (
 
 </div>
 
-        <div className="sidebar-bottom">
-          <div className="avatar">JD</div>
-          <div>
-            <strong>John Doe</strong>
-            <small>Personal Account</small>
-          </div>
-        </div>
-      </aside>
+        
+<div className="sidebar-bottom">
+  <div className="avatar">
+    {profilePicture ? (
+      <img
+        src={profilePicture}
+        alt={userName}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: "50%"
+        }}
+      />
+    ) : (
+      (userName || "User")
+        .split(" ")
+        .map(word => word[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    )}
+  </div>
+
+  <div>
+    <strong>{userName || "User"}</strong>
+    <small>{userEmail || "Personal Account"}</small>
+  </div>
+</div>
+</aside>
 
       <main className="main-content">
 
