@@ -15,6 +15,19 @@ const greeting =
     : "Good evening";
   const [session, setSession] = useState(null);
 const [authLoading, setAuthLoading] = useState(true);
+const [authMode, setAuthMode] = useState("register");
+
+const handleLogout = async () => {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    alert("Logout failed: " + error.message);
+    return;
+  }
+
+  setAuthMode("login");
+  setSession(null);
+};
 
 useEffect(() => {
   supabase.auth.getSession().then(({ data, error }) => {
@@ -242,8 +255,13 @@ const filteredTasks = tasks.filter(task => {
   }
 
   if (!session) {
-    return <Auth onAuthSuccess={setSession} />;
-  }  
+  return (
+    <Auth
+      onAuthSuccess={setSession}
+      initialMode={authMode}
+    />
+  );
+}
 return (
     <div className="app">
 
