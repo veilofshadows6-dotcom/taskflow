@@ -1,0 +1,90 @@
+
+:root {
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* ===== RECENT TASKS FILTER DESIGN ===== */
+
+.tasks-section .task-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 25px;
+}
+
+.tasks-section .task-filters {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.tasks-section .task-filters button {
+  background: #111d30;
+  color: #91a0b7;
+  border: 1px solid #2b3c56;
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  transition: 0.2s ease;
+}
+
+.tasks-section .task-filters button:hover {
+  background: #253550;
+  color: white;
+}
+
+.tasks-section .task-filters button.active {
+  background: #304b7d;
+  color: white;
+  border-color: #668cff;
+}
+
+.tasks-section .task-controls .search-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 13px 15px;
+  background: #101b2d;
+  border: 1px solid #34445e;
+  border-radius: 9px;
+}
+
+@media (max-width: 650px) {
+  .tasks-section .task-filters {
+    width: 100%;
+  }
+
+  .tasks-section .task-filters button {
+    flex: 1;
+    padding: 10px 8px;
+  }
+
+  .tasks-section .task-controls .search-input {
+    max-width: 100%;
+  }
+}
+.tasks-section .task-controls .search-input {
+  width: 100%;
+  max-width: none;
+  padding: 13px 15px;
+  background: #101b2d;
+  border: 1px solid #34445e;
+  border-radius: 9px;
+  display: block;
+}
